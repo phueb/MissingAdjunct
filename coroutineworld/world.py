@@ -2,7 +2,7 @@ import random
 
 from coroutineworld import configs
 from coroutineworld.state import State
-from coroutineworld.instructions import Query, Transition, TICK
+from coroutineworld.communications import Query, Transition, TICK
 from coroutineworld.entity import Entity
 
 
@@ -24,18 +24,22 @@ class World(object):
     def assign(self, x, y, state):
         self.xy2state[(x % self.num_x, y % self.num_y)] = state
 
-    def turn(self, instructions):
+    def turn(self, interface):
 
-        instr = next(instructions)
-        while instr is not TICK:
-            if isinstance(instr, Query):
-                state = self.query(instr.y, instr.x)
-                instr = instructions.send(state)
-            elif isinstance(instr, Transition):
-                self.assign(instr.y, instr.x, instr.state)
-                instr = next(instructions)
+        step = next(interface)
+        while step is not TICK:
+
+            # communication from semantic rules to world
+            if isinstance(step, Query):
+                state = self.query(step.y, step.x)
+                step = interface.send(state)
+
+            # communication from world to semantic rules
+            elif isinstance(step, Transition):
+                self.assign(step.y, step.x, step.state)
+                step = next(interface)
             else:
-                raise RuntimeError(f'Did not recognize {instr}')
+                raise RuntimeError(f'Did not recognize {step}')
 
     def __str__(self):
         res = ''
