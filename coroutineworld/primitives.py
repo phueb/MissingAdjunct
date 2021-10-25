@@ -6,23 +6,6 @@ from coroutineworld.entity import Animate
 from coroutineworld.communications import Query
 
 
-handler = colorlog.StreamHandler()
-handler.setFormatter(colorlog.ColoredFormatter(
-    fmt='%(log_color)s%(levelname)s:%(name)s:%(message)s',
-    log_colors={
-        'DEBUG': 'blue',
-        'INFO': 'blue',
-        'WARNING': 'yellow',
-        'ERROR': 'red',
-        'CRITICAL': 'red,bg_white',
-    },
-))
-
-log_primitives = colorlog.getLogger('primitives')
-log_primitives.addHandler(handler)
-log_primitives.setLevel('DEBUG')
-
-
 class Primitive:
     def __call__(self,
                  x: int,

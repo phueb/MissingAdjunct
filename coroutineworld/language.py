@@ -13,6 +13,9 @@ class LogicalForm:
     l: Optional[Entity] = None
 
 
+WS = ' '
+
+
 class Corpus:
     def __init__(self):
         self.logical_forms: List[LogicalForm] = []
@@ -21,5 +24,8 @@ class Corpus:
     def to_sentence(lf: LogicalForm,
                     ) -> str:
         res = f'{lf.x} {lf.v}'
+
+        if lf.y is not None:
+            res += WS + lf.y.name
 
         return res

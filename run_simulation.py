@@ -28,6 +28,23 @@ log_main = colorlog.getLogger('main')
 log_main.addHandler(handler)
 log_main.setLevel('DEBUG')
 
+handler = colorlog.StreamHandler()
+handler.setFormatter(colorlog.ColoredFormatter(
+    fmt='%(log_color)s%(levelname)s:%(name)s:%(message)s',
+    log_colors={
+        'DEBUG': 'blue',
+        'INFO': 'blue',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
+        'CRITICAL': 'red,bg_white',
+    },
+))
+
+log_language = colorlog.getLogger('language')
+log_language.addHandler(handler)
+log_language.setLevel('DEBUG')
+
+
 corpus = Corpus()
 
 
@@ -49,23 +66,26 @@ def modify_state(x: int,
 
             log_main.info('\n')
 
-            # perform all actions
+            # decide event
             drive = animate.get_max_drive()
             event = animate.decide_event(drive)
 
             event_failed = False
+
+            # perform all actions
             for action in event.actions:
                 action: Action
 
+                # get optional requirements for action
+                try:
+                    requirements_y = event.requirements_y[action.name]
+                except KeyError:
+                    loader_y = None
+                else:
+                    loader_y = random.choice(requirements_y)
+
                 # perform all primitives of action
                 for primitive in action.primitives:
-                    primitive: Primitive
-
-                    requirements_y = event.requirements_y[action.name]
-                    loader_y = random.choice(requirements_y)  # loader must be called to load entity
-
-                    log_main.debug(f'{animate} {action} {loader_y.name}')
-                    log_main.debug(f'current state has {loader_y.name}={state_current.has_name(loader_y)}')
 
                     # move animate entity to current cell if current cell if condition is met
                     if isinstance(primitive, MoveIfY):
@@ -82,18 +102,18 @@ def modify_state(x: int,
                 animate.hunger.up()
 
                 if event_failed:
-                    log_main.debug(f'{event} failed')
+                    log_main.warn(f'{event} failed')
                     break
 
                 # linguistic description
-                corpus.logical_forms.append(
-                    LogicalForm(x=animate.name,
-                                v=action.name,
-                                ))
+                lf = LogicalForm(x=animate.name, v=action.name, y=loader_y)
+                corpus.logical_forms.append(lf)
+                log_language.info(corpus.to_sentence(lf))
 
             if not event_failed:
                 drive.reset()
 
+    # now move animate entities - do not move entities while iterating over them
     for animate, state_src in animate2state_src.items():
         state_src.animates.remove(animate)
         state_current.animates.append(animate)
