@@ -1,9 +1,12 @@
 import random
+from typing import Generator, Union
 
 from coroutineworld import configs
 from coroutineworld.state import State
-from coroutineworld.communications import Query, Transition, TICK
-from coroutineworld.entity import Entity
+from coroutineworld.communications import Query, TICK, TOCK
+from coroutineworld.entity import Animate, InAnimate
+
+from semantics.entities import animates, inanimates
 
 
 class World(object):
@@ -11,38 +14,39 @@ class World(object):
         self.num_x = configs.World.num_x
         self.num_y = configs.World.num_y
         self.xy2state = {}
-        for x, region in enumerate(configs.World.regions):
+
+        # populate each cell
+        for x in range(self.num_x):
             for y in range(self.num_y):
-                self.xy2state[(x, y)] = State(region=region,
-                                              entities=[Entity()
-                                                        for _ in range(random.randint(*configs.World.entity_range))],
-                                              )
+                animates_ = [InAnimate.from_def(a_def) for a_def in
+                             random.choices(animates.definitions, k=configs.World.num_animates_per_cell)]
+                inanimates_ = [InAnimate.from_def(a_def) for a_def in
+                               random.choices(inanimates.definitions, k=configs.World.num_inanimates_per_cell)]
+                self.xy2state[(x, y)] = State(animates=animates_,
+                                              inanimates=inanimates_)
 
     def query(self, x, y):
         return self.xy2state[(x % self.num_x, y % self.num_y)]
 
-    def assign(self, x, y, state):
-        self.xy2state[(x % self.num_x, y % self.num_y)] = state
+    def turn(self, interface: Generator[Union[TICK, TOCK], State, None]):
 
-    def turn(self, interface):
-
-        step = next(interface)
-        while step is not TICK:
+        comm = next(interface)
+        while comm is not TICK:
 
             # communication from semantic rules to world
-            if isinstance(step, Query):
-                state = self.query(step.y, step.x)
-                step = interface.send(state)
+            if isinstance(comm, Query):
+                state = self.query(comm.x, comm.y)
+                comm = interface.send(state)
 
             # communication from world to semantic rules
-            elif isinstance(step, Transition):
-                self.assign(step.y, step.x, step.state)
-                step = next(interface)
+            elif comm is TOCK:
+                comm = next(interface)
+
             else:
-                raise RuntimeError(f'Did not recognize {step}')
+                raise RuntimeError(f'Did not recognize {comm}')
 
     def __str__(self):
-        res = ''
+        res = 'World states:\n'
         for (x, y), state in self.xy2state.items():
             res += f'{x} {y} | {state}\n'
         return res

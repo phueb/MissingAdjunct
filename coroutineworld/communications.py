@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from coroutineworld.state import State
-
 
 @dataclass
 class Query:
@@ -9,12 +7,11 @@ class Query:
     y: int
 
 
-@dataclass
-class Transition:
-    x: int
-    y: int
-    state: State
-
-
 class TICK:
-    pass
+    def __str__(self):
+        return 'TICK'
+
+
+class TOCK:
+    def __str__(self):
+        return 'TOCK'
