@@ -12,12 +12,12 @@ class State:
     def __str__(self):
         return f'State with {len(self.animates):>3} animates and {len(self.inanimates):>3} inanimates'
 
-    def has_name(self, entity: Entity) -> bool:
+    def has_name(self, name) -> bool:
         for ie in self.inanimates:
-            if ie.name == entity.name:
+            if ie.name == name:
                 return True
         for ae in self.animates:
-            if ae.name == entity.name:
+            if ae.name == name:
                 return True
         return False
 

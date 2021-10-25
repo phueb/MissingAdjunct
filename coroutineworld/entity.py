@@ -13,7 +13,6 @@ class Entity:
                  ):
         self.name = name
         self.categories = categories
-        self.definite = False  # todo how does an entity become definite?
 
     def __str__(self):
         res = f'<Entity name={self.name}>'

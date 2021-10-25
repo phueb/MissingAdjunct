@@ -80,16 +80,16 @@ def modify_state(x: int,
                 try:
                     requirements_y = event.requirements_y[action.name]
                 except KeyError:
-                    loader_y = None
+                    entity_y = None
                 else:
-                    loader_y = random.choice(requirements_y)
+                    entity_y = random.choice(requirements_y)()
 
                 # perform all primitives of action
                 for primitive in action.primitives:
 
                     # move animate entity to current cell if current cell if condition is met
                     if isinstance(primitive, MoveIfY):
-                        if state_current.has_name(loader_y):
+                        if state_current.has_name(entity_y.name):
                             log_main.debug(f'{animate} moved to {x} {y}')
                             animate2state_src[animate] = state_neighbor
                         else:
@@ -102,11 +102,11 @@ def modify_state(x: int,
                 animate.hunger.up()
 
                 if event_failed:
-                    log_main.warn(f'{event} failed')
+                    log_main.warning(f'{event} failed')
                     break
 
                 # linguistic description
-                lf = LogicalForm(x=animate.name, v=action.name, y=loader_y)
+                lf = LogicalForm(x=animate.name, v=action.name, y=entity_y)
                 corpus.logical_forms.append(lf)
                 log_language.info(corpus.to_sentence(lf))
 
