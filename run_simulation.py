@@ -3,14 +3,14 @@ import colorlog
 from itertools import product
 import random
 
-from coroutineworld.world import World
-from coroutineworld.state import State
-from coroutineworld.communications import Query, TICK, TOCK
-from coroutineworld.language import LogicalForm, Corpus
-from coroutineworld.event import Event, Action
-from coroutineworld.entity import Animate
-from coroutineworld.primitives import Primitive, MoveIfY
-from coroutineworld import configs
+from missingadjunct.world import World
+from missingadjunct.state import State
+from missingadjunct.communications import Query, TICK, TOCK
+from missingadjunct.language import LogicalForm, Corpus
+from missingadjunct.event import Event, Action
+from missingadjunct.entity import Animate
+from missingadjunct.primitives import Primitive, MoveIfY
+from missingadjunct import configs
 
 handler = colorlog.StreamHandler()
 handler.setFormatter(colorlog.ColoredFormatter(
