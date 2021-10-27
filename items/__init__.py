@@ -55,7 +55,7 @@ agents = (
 
 
 themes = (
-a
+
     # LOCATION 1 #########################################################
 
     Theme(category='VEGETABLE',
