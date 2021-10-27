@@ -147,7 +147,7 @@ themes = (
                  Verb(type=2, name='dry', instrument='dryer'),
                  Verb(type=3, name='cut', instrument='scissors'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='WOOD',
@@ -157,7 +157,7 @@ themes = (
                  Verb(type=2, name='seal', instrument='lacquer'),
                  Verb(type=3, name='cut', instrument='saw'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='PPE',
@@ -167,7 +167,7 @@ themes = (
                  Verb(type=2, name='dust', instrument='duster'),
                  Verb(type=3, name='clean', instrument='towel'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='MACHINERY',
@@ -177,7 +177,7 @@ themes = (
                  Verb(type=2, name='lubricate', instrument='lubricant'),
                  Verb(type=3, name='clean', instrument='vacuum'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='GASOLINE',
@@ -187,7 +187,7 @@ themes = (
                  Verb(type=2, name='transfer', instrument='pump'),
                  Verb(type=3, name='pour', instrument='canister'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='CAR',
@@ -197,7 +197,7 @@ themes = (
                  Verb(type=2, name='polish', instrument='polisher'),
                  Verb(type=3, name='decorate', instrument='paint'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='ROCK',
@@ -207,7 +207,7 @@ themes = (
                  Verb(type=2, name='shoot', instrument='slingshot'),
                  Verb(type=3, name='carve', instrument='chisel'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
     Theme(category='METAL',
@@ -217,7 +217,7 @@ themes = (
                  Verb(type=2, name='harden', instrument='hammer'),
                  Verb(type=3, name='heat', instrument='furnace'),
                  ),
-          location=LOC1
+          location=LOC2
           ),
 
 )
