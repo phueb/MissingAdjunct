@@ -2,7 +2,7 @@ from typing import Tuple, Generator
 import random
 
 from missingadjunct import configs
-from items import Theme, Agent, LogicalForm
+from items import Theme, Agent, LogicalForm, Verb
 
 TICK = object()
 
@@ -30,10 +30,10 @@ class Design:
 
                 for verb in theme.verbs:
 
-                    form = LogicalForm(agent=random.choice(agent.members),
-                                       theme=random.choice(theme.members),
+                    form = LogicalForm(agent=random.choice(agent.names),
+                                       theme=random.choice(theme.names),
                                        verb=verb.name,
-                                       instrument=verb.instruments[theme.location] if verb.instruments else None,
+                                       instrument=verb.instrument,
                                        location=theme.location if configs.Corpus.include_location else None,
                                        )
                     yield form
