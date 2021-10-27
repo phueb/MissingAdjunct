@@ -2,7 +2,6 @@
 
 A Python-based tool for generating a corpus of pseudo-English sentences with experimenter-controlled statistics.
 
-> :warning: **WARNING**: Research project. Under active development.
 
 
 ## About
