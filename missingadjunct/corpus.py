@@ -66,7 +66,7 @@ class Corpus:
     def save(self):
 
         fn = f'{FILE_NAME}_{self.date}.pkl'
-        path_out = (configs.Dirs.pickles / fn)
+        path_out = (configs.Dirs.root / fn)
         with path_out.open('wb') as file:
             pickle.dump(self, file)
 
@@ -81,7 +81,7 @@ class Corpus:
             date = get_date()
         fn = f'{FILE_NAME}_{date}.pkl'
 
-        path_out = (configs.Dirs.pickles / fn)
+        path_out = (configs.Dirs.root / fn)
         with path_out.open('rb') as file:
             res = pickle.load(file)
 
@@ -157,5 +157,14 @@ class Corpus:
                   params: Params,
                   ) -> Generator[Tuple, None, None]:
         for lf in self.gen_logical_forms(params):
-            tree = ()
+            if params.include_location:
+                if lf.instrument:
+                    tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
+                else:
+                    tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
+            else:
+                if lf.instrument:
+                    tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
+                else:
+                    tree = (lf.agent, (lf.verb, lf.theme))
             yield tree
