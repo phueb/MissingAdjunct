@@ -14,13 +14,15 @@ This repository generates a corpus for training and evaluating distributional se
 
 ## Usage
 
-First, populate an instance of `Corpus` with logical_forms, and `save()` the populated `Corpus` instance.
-The result is a pickle file that can be loaded as shown in `load_corpus.py`.
+To use the corpus, see `load.py`. 
+This script loads a pickle file, included in this repository, and is ready for training semantic models.
 For example, to exclude instrument adjuncts when training semantic models, use 
 
 ```python
 params = Params(include_location=False, ...)
 ```
+
+Note: You will have to copy `params.py` or its contents to your own project. 
 
 Then, 
 
@@ -28,6 +30,14 @@ Then,
 for n, sentence in enumerate(corpus.gen_sentences(params)):
     print(sentence)
 ```
+
+## Advanced
+
+To generate a pickled `Corpus` instance:
+1. populate an instance of `Corpus` with logical_forms
+2. `save()` the populated `Corpus` instance.
+
+The result is a pickle file that can be loaded as shown in `load_corpus.py`.
 
 ## Compatibility
 
