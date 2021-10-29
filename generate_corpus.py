@@ -1,4 +1,3 @@
-from typing import Coroutine, Generator, Union, Dict
 import colorlog
 
 from missingadjunct import configs
@@ -25,12 +24,6 @@ log_language.addHandler(handler)
 log_language.setLevel('DEBUG')
 
 
-def modify_state(
-                 ) -> Coroutine[None, None, None]:
-
-    yield None
-
-
 def main():
 
     design = Design(agents=agents, themes=themes)
@@ -50,3 +43,4 @@ def main():
 if __name__ == '__main__':
 
     main()
+
