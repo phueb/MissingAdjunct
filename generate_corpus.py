@@ -31,9 +31,9 @@ def main():
 
     for i in range(configs.Corpus.num_epochs):
 
-        for form in design.epoch():
-            corpus.forms.append(form)
-            log_language.info(form)
+        for logical_form in design.epoch():
+            corpus.logical_forms.append(logical_form)
+            log_language.info(logical_form)
 
         corpus.plot_stats()  # keep track of convergence
 

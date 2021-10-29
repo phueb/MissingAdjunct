@@ -1,8 +1,7 @@
 from typing import Tuple, Generator
 import random
 
-from missingadjunct import configs
-from items import Theme, Agent, LogicalForm, Verb
+from items import Theme, Agent, LogicalForm
 
 TICK = object()
 
@@ -11,11 +10,12 @@ class Design:
     def __init__(self,
                  agents: Tuple[Agent, ...],
                  themes: Tuple[Theme, ...],
+                 include_location_specific_agents: bool = False
                  ) -> None:
         self.agents = agents
         self.themes = themes
 
-        if not configs.Corpus.include_location_specific_agents:
+        if not include_location_specific_agents:
             self.agents = [a for a in self.agents if a.location is None]
 
     def epoch(self) -> Generator[LogicalForm, None, None]:
@@ -34,6 +34,6 @@ class Design:
                                        theme=random.choice(theme.names),
                                        verb=verb.name,
                                        instrument=verb.instrument,
-                                       location=theme.location if configs.Corpus.include_location else None,
+                                       location=theme.location,
                                        )
                     yield form

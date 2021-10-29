@@ -17,7 +17,7 @@ def get_date():
 
 class Corpus:
     def __init__(self):
-        self.forms: List[LogicalForm] = []
+        self.logical_forms: List[LogicalForm] = []
 
         self.params = {}  # TODO
 
@@ -56,24 +56,26 @@ class Corpus:
 
     def gen_sentences(self,
                       num_epochs: int = 1,
+                      include_location: bool = False,
                       ) -> Generator[str, None, None]:
         for epoch in range(num_epochs):
-            for lf in self.forms:
+            for lf in self.logical_forms:
 
                 sentence = lf.agent + WS + lf.verb + WS + lf.theme + WS
 
                 if lf.instrument:
                     sentence += 'with' + WS + lf.instrument + WS
 
-                if lf.location:
+                if lf.location and include_location:  # TODO
                     sentence += 'in' + WS + lf.location + WS
 
                 yield sentence
 
     def gen_trees(self,
                   num_epochs: int = 1,
+                  include_location: bool = False,
                   ) -> Generator[Tuple, None, None]:
         for epoch in range(num_epochs):
-            for lf in self.forms:
+            for lf in self.logical_forms:
                 tree = ()
                 yield tree
