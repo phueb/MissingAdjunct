@@ -110,16 +110,29 @@ class Corpus:
         for agent_class in self.agent_classes:
             if agent_class.location is not None and agent in agent_class.names:
                 return True
+
         return False
 
     def gen_logical_forms(self,
                           params: Params,
                           ) -> Generator[LogicalForm, None, None]:
+
+        # check that silent-instrument themes are actually themes in the corpus
+        themes = set()
+        for theme_class in self.theme_classes:
+            themes.update(theme_class.names)
+        for theme in params.instrument_silent_themes:
+            if theme not in themes:
+                raise KeyError(f'{theme} is not a theme in the corpus')
+
         for epoch in range(params.num_epochs):
             for lf in self.logical_forms:
 
                 if not params.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
                     continue
+
+                if lf.theme in params.instrument_silent_themes:
+                    lf.instrument = None
 
                 if not params.include_location:
                     lf.location = None

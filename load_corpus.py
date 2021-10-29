@@ -9,9 +9,6 @@ path_out = (configs.Dirs.pickles / fn)
 with path_out.open('rb') as file:
     corpus = pickle.load(file)
 
-
-corpus.print_counts()
-
 params = Params(include_location=False,
                 include_location_specific_agents=False,
                 num_epochs=1,
