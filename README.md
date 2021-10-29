@@ -27,7 +27,7 @@ Note: You will have to copy `params.py` or its contents to your own project.
 Then, 
 
 ```python
-for n, sentence in enumerate(corpus.gen_sentences(params)):
+for sentence in corpus.gen_sentences(params):
     print(sentence)
 ```
 
