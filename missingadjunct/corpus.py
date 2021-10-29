@@ -3,6 +3,7 @@ from typing import Optional, Generator, List, Tuple
 import datetime
 from itertools import product
 from functools import lru_cache
+from collections import Counter
 
 from missingadjunct import configs
 from missingadjunct.params import Params
@@ -84,11 +85,25 @@ class Corpus:
         with path_out.open('rb') as file:
             res = pickle.load(file)
 
+        res.check_integrity()
+
         return res
 
-    def print_info(self):
-        print('Info about corpus:')
-        print(f'date={self.date}')
+    def print_counts(self):
+        assert self.has_forms
+
+        c = Counter()
+        for lf in self.logical_forms:
+            c.update([lf.agent, lf.verb, lf.instrument, lf.location])
+
+        for w, f in c.most_common():
+            if w is None:
+                continue
+            print(f'{w:<12} occurs {f:>6} times')
+
+    def check_integrity(self):
+        assert self.has_forms
+        assert len(set(self.logical_forms)) == len(self.logical_forms)
 
     @lru_cache()
     def is_agent_location_specific(self, agent: str) -> bool:

@@ -10,7 +10,7 @@ with path_out.open('rb') as file:
     corpus = pickle.load(file)
 
 
-corpus.print_info()
+corpus.print_counts()
 
 params = Params(include_location=False,
                 include_location_specific_agents=False,
@@ -21,3 +21,5 @@ for n, sentence in enumerate(corpus.gen_sentences(params)):
 
     words = ' '.join([f'{w:<12}' for w in sentence.split()])
     print(f'{n:>6} {words}')
+
+corpus.print_counts()
