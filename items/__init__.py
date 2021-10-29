@@ -41,7 +41,7 @@ class Theme:
     location: str
 
 
-agents = (
+agent_classes = (
     Agent(names=('John', 'Mary', 'Fatima'),
           location=None,
           ),
@@ -54,7 +54,7 @@ agents = (
 )
 
 
-themes = (
+theme_classes = (
 
     # LOCATION 1 #########################################################
 

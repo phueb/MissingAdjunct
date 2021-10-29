@@ -7,6 +7,3 @@ class Dirs:
     pickles = root / 'pickles'
 
 
-class Corpus:
-    num_epochs = 1
-
