@@ -1,7 +1,7 @@
 import pickle
 from typing import Optional, Generator, List, Tuple
 import datetime
-from itertools import product
+import random
 from functools import lru_cache
 from collections import Counter
 
@@ -23,10 +23,14 @@ class Corpus:
     def __init__(self,
                  agent_classes: Tuple[Agent, ...],
                  theme_classes: Tuple[Theme, ...],
+                 seed: int,
+                 num_epochs: int,
                  ) -> None:
 
         self.agent_classes = agent_classes
         self.theme_classes = theme_classes
+        self.seed = seed
+        self.num_epochs = num_epochs
 
         self.logical_forms: List[LogicalForm] = []
 
@@ -39,34 +43,46 @@ class Corpus:
         return False
 
     def populate(self) -> None:
-        """create all sentences that are possible given the design"""
+        """
+        for each epoch, get all possible templates, and randomly chose from agent and theme.
+        in this way, the resulting corpus has a random uniform distribution over agents and themes,
+        which enables statistical testing on semantic models without any inherent randomness.
+        """
+
+        random.seed(self.seed)
 
         if self.has_forms:
             raise RuntimeError('Corpus already has logical forms. ')
 
-        for theme_class in self.theme_classes:
+        for epoch in range(self.num_epochs):
 
-            for agent_class in self.agent_classes:
+            for theme_class in self.theme_classes:
 
-                if agent_class.location is not None:
-                    if agent_class.location != theme_class.location:
-                        continue
+                for agent_class in self.agent_classes:
 
-                for verb in theme_class.verbs:
+                    if agent_class.location is not None:
+                        if agent_class.location != theme_class.location:
+                            continue
 
-                    for agent, theme in product(agent_class.names, theme_class.names):
+                    for verb in theme_class.verbs:
+
+                        agent = random.choice(agent_class.names)
+                        theme = random.choice(theme_class.names)
                         form = LogicalForm(agent=agent,
                                            theme=theme,
                                            verb=verb.name,
                                            instrument=verb.instrument,
                                            location=theme_class.location,
+                                           epoch=epoch,
                                            )
                         self.logical_forms.append(form)
 
     def save(self):
 
-        fn = f'{FILE_NAME}_{self.date}.pkl'
-        path_out = (configs.Dirs.root / fn)
+        fn = f'{FILE_NAME}_{self.date}_{self.seed}.pkl'
+        path_out = (configs.Dirs.root / f'{FILE_NAME}_{self.date}' / fn)
+        if not path_out.parent.exists():
+            path_out.parent.mkdir()
         with path_out.open('wb') as file:
             pickle.dump(self, file)
 
@@ -94,7 +110,7 @@ class Corpus:
 
         c = Counter()
         for lf in self.logical_forms:
-            c.update([lf.agent, lf.verb, lf.instrument, lf.location])
+            c.update([lf.agent, lf.verb, lf.theme, lf.instrument, lf.location])
 
         for w, f in c.most_common():
             if w is None:
@@ -113,9 +129,12 @@ class Corpus:
 
         return False
 
-    def gen_logical_forms(self,
+    def get_logical_forms(self,
                           params: Params,
                           ) -> Generator[LogicalForm, None, None]:
+
+        if params.num_epochs > self.num_epochs:
+            raise AttributeError(f'Requested {params.num_epochs} epochs but corpus was populated with {self.num_epochs} epochs')
 
         # check that silent-instrument themes are actually themes in the corpus
         themes = set()
@@ -125,23 +144,25 @@ class Corpus:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
 
-        for epoch in range(params.num_epochs):
-            for lf in self.logical_forms:
+        for lf in self.logical_forms:
 
-                if not params.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
-                    continue
+            if not lf.epoch < params.num_epochs:
+                continue
 
-                if lf.theme in params.instrument_silent_themes:
-                    lf.instrument = None
+            if not params.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
+                continue
 
-                if not params.include_location:
-                    lf.location = None
-                yield lf
+            if lf.theme in params.instrument_silent_themes:
+                lf.instrument = None
 
-    def gen_sentences(self,
+            if not params.include_location:
+                lf.location = None
+            yield lf
+
+    def get_sentences(self,
                       params: Params,
                       ) -> Generator[str, None, None]:
-        for lf in self.gen_logical_forms(params):
+        for lf in self.get_logical_forms(params):
 
             sentence = lf.agent + WS + lf.verb + WS + lf.theme + WS
 
@@ -153,10 +174,10 @@ class Corpus:
 
             yield sentence
 
-    def gen_trees(self,
+    def get_trees(self,
                   params: Params,
                   ) -> Generator[Tuple, None, None]:
-        for lf in self.gen_logical_forms(params):
+        for lf in self.get_logical_forms(params):
             if params.include_location:
                 if lf.instrument:
                     tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))

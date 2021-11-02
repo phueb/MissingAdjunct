@@ -22,14 +22,18 @@ For example, to exclude instrument adjuncts when training semantic models, use
 params = Params(include_location=False, ...)
 ```
 
-Note: You will have to copy `params.py` or its contents to your own project. 
+Note: You will have to copy `params.py` or its contents to your own project.
 
 Then, 
 
 ```python
-for sentence in corpus.gen_sentences(params):
+for sentence in corpus.get_sentences(params):
     print(sentence)
 ```
+
+Note: There are multiple files saved in the same corpus location. 
+These files correspond to different random seeds, and produce corpora that differ slightly in their random uniform distributions over agents and themes. 
+The purpose of seeds is to enable statistical hypothesis testing.
 
 ## Advanced
 

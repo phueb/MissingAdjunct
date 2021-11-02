@@ -13,6 +13,8 @@ class LogicalForm:
     instrument: Optional[str]
     location: Optional[str]
 
+    epoch: int
+
 
 @dataclass
 class Verb:
