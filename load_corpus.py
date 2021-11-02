@@ -17,7 +17,7 @@ corpus.print_counts()
 # parameters that decide how to sample from corpus
 params = Params(include_location=False,
                 include_location_specific_agents=False,
-                num_epochs=3,  # this number selects how many of the 100 existing epochs should be retrieved
+                num_epochs=3,  # this number selects how many of the 1000 existing epochs should be retrieved
                 instrument_silent_themes=['pepper',
                                           'orange',
                                           'blender',

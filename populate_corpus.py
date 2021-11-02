@@ -5,7 +5,7 @@ from missingadjunct.corpus import Corpus
 from items import agent_classes, theme_classes
 
 
-NUM_EPOCHS = 100
+NUM_EPOCHS = 1000
 NUM_SEEDS = 10
 
 
