@@ -4,6 +4,7 @@ import datetime
 import random
 from functools import lru_cache
 from collections import Counter
+from itertools import product
 
 from missingadjunct import configs
 from missingadjunct.params import Params
@@ -54,6 +55,29 @@ class Corpus:
         if self.has_forms:
             raise RuntimeError('Corpus already has logical forms. ')
 
+        # first, populate with all possible logical forms once
+        for theme_class in self.theme_classes:
+
+            for agent_class in self.agent_classes:
+
+                if agent_class.location is not None:
+                    if agent_class.location != theme_class.location:
+                        continue
+
+                for verb in theme_class.verbs:
+
+                    for agent, theme in product(agent_class.names, theme_class.names):
+
+                        form = LogicalForm(agent=agent,
+                                           theme=theme,
+                                           verb=verb.name,
+                                           instrument=verb.instrument,
+                                           location=theme_class.location,
+                                           epoch=-1,
+                                           )
+                        self.logical_forms.append(form)
+
+        # for remaining epochs, sample randomly from agent and theme
         for epoch in range(self.num_epochs):
 
             for theme_class in self.theme_classes:
