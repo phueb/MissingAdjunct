@@ -164,7 +164,7 @@ class Corpus:
         themes = set()
         for theme_class in self.theme_classes:
             themes.update(theme_class.names)
-        for theme in params.instrument_silent_themes:
+        for theme in params.experimental_themes:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
 
@@ -176,7 +176,7 @@ class Corpus:
             if not params.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
                 continue
 
-            if lf.theme in params.instrument_silent_themes:
+            if lf.theme in params.experimental_themes:
                 lf.instrument = None
 
             if not params.include_location:

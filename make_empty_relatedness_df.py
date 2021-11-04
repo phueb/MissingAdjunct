@@ -8,7 +8,7 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
-from missingadjunct.params import i_silent_themes
+from missingadjunct.params import experimental_themes
 from items import theme_classes
 
 phrases = []
@@ -26,10 +26,10 @@ for theme_class in theme_classes:
 
             phrase_observed = verb.name + ' ' + theme
 
-            if theme in i_silent_themes:
-                theme_type = 'i-silent'
+            if theme in experimental_themes:
+                theme_type = 'experimental'  # instruments are never observed with this theme
             else:
-                theme_type = 'i-observed'
+                theme_type = 'control'  # instruments are observed with this theme
 
             # collect
             phrases.append(phrase_observed)
@@ -42,7 +42,6 @@ for theme_class in theme_classes:
         for theme_class_other in theme_classes:
 
             if theme_class == theme_class_other:
-                print('skipping')
                 continue
 
             for verb_from_other_theme in theme_class_other.verbs:
@@ -52,8 +51,8 @@ for theme_class in theme_classes:
 
                 phrase_unobserved = verb_from_other_theme.name + ' ' + theme
 
-                if theme in i_silent_themes:
-                    theme_type = 'i-silent'
+                if theme in experimental_themes:
+                    theme_type = 'experimental'
                 else:
                     continue
 
