@@ -22,7 +22,8 @@ experimental_themes = ['pepper',
 
 @dataclass
 class Params:
+    seed: int
     num_epochs: int
     include_location: bool
     include_location_specific_agents: bool
-    experimental_themes: List[str] = field(default_factory=experimental_themes)
+    experimental_themes: List[str] = field(default_factory=lambda: experimental_themes)

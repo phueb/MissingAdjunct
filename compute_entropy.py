@@ -1,40 +1,31 @@
 from collections import Counter
-import pickle
-from pathlib import Path
 import numpy as np
 from pyitlib import discrete_random_variable as drv
 
 from missingadjunct.params import Params
+from missingadjunct.corpus import Corpus
 
-
-CORPUS_NAME = 'missingadjunct_corpus_2021-11-03'
-SEED = 0
-
-MAX_NUM_EPOCHS = 1000
-
-path_corpus_file = (Path(CORPUS_NAME) / f'{CORPUS_NAME}_{SEED}.pkl')
-with path_corpus_file.open('rb') as file:
-    corpus = pickle.load(file)
 
 params = Params(include_location=False,
                 include_location_specific_agents=False,
                 num_epochs=1,
-                instrument_silent_themes=[],
+                seed=1
                 )
+corpus = Corpus.from_params(params)
 
 lfs_in_epoch = [lf for lf in corpus.get_logical_forms(params) if lf.epoch == 0]
 num_templates = len(list(lfs_in_epoch))  # should be 64 without a location-specific agents and locations
-print(num_templates)
+assert num_templates == 64
 
 # there are 9 possibilities, because there are 3 agents and 3 themes, and they can combine in 9 unique ways
 max_h = drv.entropy_pmf([1/9] * 9, base=2)  # this is the entropy that distributions should converge towards
 
-for num_epochs in range(1, MAX_NUM_EPOCHS):
+for num_epochs in range(1, corpus.max_num_epochs):
     # parameters that decide how to sample from corpus
     params = Params(include_location=False,
                     include_location_specific_agents=False,
                     num_epochs=num_epochs,
-                    instrument_silent_themes=[],
+                    seed=1,
                     )
 
     # collect templates (a template is a logical form with a specific verb and instrument, there are 64)

@@ -1,4 +1,3 @@
-import pickle
 from typing import Optional, Generator, List, Tuple
 import datetime
 import random
@@ -6,9 +5,9 @@ from functools import lru_cache
 from collections import Counter
 from itertools import product
 
-from missingadjunct import configs
 from missingadjunct.params import Params
-from items import LogicalForm, Agent, Theme
+from items import LogicalForm
+from items import agent_classes, theme_classes
 
 
 FILE_NAME = 'missingadjunct_corpus'
@@ -22,16 +21,16 @@ def get_date():
 
 class Corpus:
     def __init__(self,
-                 agent_classes: Tuple[Agent, ...],
-                 theme_classes: Tuple[Theme, ...],
-                 seed: int,
-                 num_epochs: int,
+                 params: Params,
                  ) -> None:
 
         self.agent_classes = agent_classes
         self.theme_classes = theme_classes
-        self.seed = seed
-        self.num_epochs = num_epochs
+
+        self.params = params
+        self.seed = params.seed
+
+        self.max_num_epochs = 1000  # max num epoch - corpus has statistically converged by then
 
         self.logical_forms: List[LogicalForm] = []
 
@@ -78,7 +77,7 @@ class Corpus:
                         self.logical_forms.append(form)
 
         # for remaining epochs, sample randomly from agent and theme
-        for epoch in range(self.num_epochs):
+        for epoch in range(self.max_num_epochs):
 
             for theme_class in self.theme_classes:
 
@@ -101,33 +100,27 @@ class Corpus:
                                            )
                         self.logical_forms.append(form)
 
-    def save(self):
-
-        fn = f'{FILE_NAME}_{self.date}_{self.seed}.pkl'
-        path_out = (configs.Dirs.root / f'{FILE_NAME}_{self.date}' / fn)
-        if not path_out.parent.exists():
-            path_out.parent.mkdir()
-        with path_out.open('wb') as file:
-            pickle.dump(self, file)
-
-        print(f'Saved corpus to {path_out}')
-
     @classmethod
-    def load(cls,
-             date: Optional[str] = None,
-             ):
+    def from_params(cls,
+                    params: Params,
+                    ):
 
-        if date is None:
-            date = get_date()
-        fn = f'{FILE_NAME}_{date}.pkl'
+        corpus = cls(params=params)
+        corpus.populate()
 
-        path_out = (configs.Dirs.root / fn)
-        with path_out.open('rb') as file:
-            res = pickle.load(file)
+        return corpus
 
-        res.check_integrity()
+    @property
+    def vocab(self) -> Tuple[str]:
+        assert self.has_forms
 
-        return res
+        res = set()
+        for lf in self.logical_forms:
+            res.update([lf.agent, lf.verb, lf.theme, lf.instrument, lf.location])
+
+        res.remove(None)
+
+        return tuple(sorted(res))
 
     def print_counts(self):
         assert self.has_forms
@@ -154,11 +147,14 @@ class Corpus:
         return False
 
     def get_logical_forms(self,
-                          params: Params,
+                          params: Optional[Params] = None,
                           ) -> Generator[LogicalForm, None, None]:
 
-        if params.num_epochs > self.num_epochs:
-            raise AttributeError(f'Requested {params.num_epochs} epochs but corpus was populated with {self.num_epochs} epochs')
+        if params is None:
+            params = self.params
+
+        if params.num_epochs > self.max_num_epochs:
+            raise AttributeError(f'Requested {params.num_epochs} epochs but corpus was populated with {self.max_num_epochs} epochs')
 
         # check that silent-instrument themes are actually themes in the corpus
         themes = set()
@@ -184,7 +180,7 @@ class Corpus:
             yield lf
 
     def get_sentences(self,
-                      params: Params,
+                      params: Optional[Params] = None,
                       ) -> Generator[str, None, None]:
         for lf in self.get_logical_forms(params):
 
@@ -199,7 +195,7 @@ class Corpus:
             yield sentence
 
     def get_trees(self,
-                  params: Params,
+                  params: Optional[Params] = None,
                   ) -> Generator[Tuple, None, None]:
         for lf in self.get_logical_forms(params):
             if params.include_location:
