@@ -60,10 +60,16 @@ v1 = co_mat[w2id['preserve']]
 v2 = co_mat[w2id['pepper']]
 vt = co_mat[w2id['vinegar']]
 vd = co_mat[w2id['dehydrator']]
-v3 = v1 + v2
-# print(cosine_similarity(v3, vt))
-# print(cosine_similarity(v3, vd))
+# v3 = v1 + v2
+v_norm = np.sqrt(sum(v2 ** 2))
+v3 = (np.dot(v1, v2) / v_norm ** 2) * v2  # project v1 on v2
+print(cosine_similarity(v3[np.newaxis, :], vt[np.newaxis, :]))
+print(cosine_similarity(v3[np.newaxis, :], vd[np.newaxis, :]))
 
+if True:
+    raise SystemExit
+
+# show that some reduced-dimensionality vectors solve the problem, others don't
 u, s, v = np.linalg.svd(co_mat, full_matrices=False, compute_uv=True)
 for num_d in range(2, co_mat.shape[1]):
     u_ = u[:, :num_d]
@@ -71,7 +77,9 @@ for num_d in range(2, co_mat.shape[1]):
     v2 = u_[w2id['pepper']]
     vt = u_[w2id['vinegar']]
     vd = u_[w2id['dehydrator']]
-    v3 = v1 + v2
+    # v3 = v1 + v2
+    v_norm = np.sqrt(sum(v2 ** 2))
+    v3 = (np.dot(v1, v2) / v_norm ** 2) * v2  # project v1 on v2
     sim_t = cosine_similarity(v3[np.newaxis, :], vt[np.newaxis, :]).round(4).item()
     sim_d = cosine_similarity(v3[np.newaxis, :], vd[np.newaxis, :]).round(4).item()
     print(sim_t, sim_d)
