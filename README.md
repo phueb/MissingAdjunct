@@ -22,7 +22,7 @@ To use the corpus in your project, see `load_corpus.py`.
 Then, 
 
 ```python
-for sentence in corpus.get_sentences(num_epochs=1):
+for sentence in corpus.get_sentences():
     print(sentence)
 ```
 

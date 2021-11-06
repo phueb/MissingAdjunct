@@ -7,21 +7,25 @@ from missingadjunct.corpus import Corpus
 
 corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
-                seed=1)
+                seed=1,
+                num_epochs=1)
 
-lfs_in_epoch = [lf for lf in corpus.get_logical_forms(num_epochs=1) if lf.epoch == 0]
+lfs_in_epoch = [lf for lf in corpus.get_logical_forms() if lf.epoch == 0]
 num_templates = len(list(lfs_in_epoch))  # should be 64 without a location-specific agents and locations
 assert num_templates == 64
 
 # there are 9 possibilities, because there are 3 agents and 3 themes, and they can combine in 9 unique ways
 max_h = drv.entropy_pmf([1/9] * 9, base=2)  # this is the entropy that distributions should converge towards
 
-for num_epochs in range(1, corpus.max_num_epochs):
-    # parameters that decide how to sample from corpus
+for num_epochs in range(1, 1000):
+    corpus = Corpus(include_location=False,
+                    include_location_specific_agents=False,
+                    seed=1,
+                    num_epochs=num_epochs)
 
     # collect templates (a template is a logical form with a specific verb and instrument, there are 64)
     template2agent_and_theme = {template_id: [] for template_id in range(num_templates)}
-    for n, lf in enumerate(corpus.get_logical_forms(num_epochs)):
+    for n, lf in enumerate(corpus.get_logical_forms()):
         if lf.epoch == -1:
             continue
         template_id = n % num_templates

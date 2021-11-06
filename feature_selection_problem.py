@@ -18,13 +18,14 @@ from missingadjunct.corpus import Corpus
 
 corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
-                seed=1)
+                seed=1,
+                num_epochs=1)
 
 # collect co-occurrences from epoch -1
 num_vocab = len(corpus.vocab)
 w2id = {w: n for n, w in enumerate(corpus.vocab)}
 co_mat = np.zeros((num_vocab, num_vocab), dtype=int)
-for lf in corpus.logical_forms:
+for lf in corpus.get_logical_forms():
 
     if lf.epoch != -1:
         continue
