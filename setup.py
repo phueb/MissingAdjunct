@@ -9,11 +9,11 @@ setup(
     package_data={'items': ['items/*.py']},
     include_package_data=True,
     install_requires=[
-        'scipy~=1.7.1'
-        'numpy~=1.21.3'
-        'pyitlib~=0.2.2'
-        'pandas~=1.3.4'
-        'scikit-learn~=1.0.1'
+        'scipy~=1.7.1',
+        'numpy~=1.21.3',
+        'pyitlib~=0.2.2',
+        'pandas~=1.3.4',
+        'scikit-learn~=1.0.1',
     ],
     url='https://github.com/phueb/MissingAdjunct',
     license='',
