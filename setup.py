@@ -6,7 +6,7 @@ setup(
     name=__name__,
     version=__version__,
     packages=find_packages(),
-    package_data={'itemsa': ['items/*.py']},
+    package_data={'items': ['items/*.py']},
     include_package_data=True,
     install_requires=[
         'scipy~=1.7.1'

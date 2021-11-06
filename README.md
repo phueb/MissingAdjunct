@@ -14,13 +14,15 @@ This repository generates a corpus for training and evaluating distributional se
 
 ## Usage
 
-To use the corpus, see `load_corpus.py`. 
+Install the repository into your virtual environment using, e.g. `pip`.
+
+To use the corpus in your project, see `load_corpus.py`. 
 
 
 Then, 
 
 ```python
-for sentence in corpus.get_sentences(params):
+for sentence in corpus.get_sentences(num_epochs=1):
     print(sentence)
 ```
 

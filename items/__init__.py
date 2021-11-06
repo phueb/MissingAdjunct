@@ -223,3 +223,20 @@ theme_classes = (
           ),
 
 )
+experimental_themes = ['pepper',
+                       'orange',
+                       'blender',
+                       'bowl',
+                       'tomato-juice',
+                       'cookie',
+                       'turkey',
+                       'tilapia',
+                       'sock',
+                       'ash',
+                       'faceshield',
+                       'workstation',
+                       'brake-fluid',
+                       'motorcycle',
+                       'marble',
+                       'copper',
+                       ]

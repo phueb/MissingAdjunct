@@ -8,8 +8,7 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
-from missingadjunct.params import experimental_themes
-from items import theme_classes
+from items import theme_classes, experimental_themes
 
 phrases = []
 instruments = set()

@@ -5,36 +5,36 @@ from functools import lru_cache
 from collections import Counter
 from itertools import product
 
-from missingadjunct.params import Params
+
 from items import LogicalForm
-from items import agent_classes, theme_classes
+from items import agent_classes, theme_classes, experimental_themes
 
 
 FILE_NAME = 'missingadjunct_corpus'
 WS = ' '
 
 
-def get_date():
-    now = datetime.datetime.now()
-    return now.strftime("%Y-%m-%d")
-
-
 class Corpus:
     def __init__(self,
-                 params: Params,
+                 seed: int,
+                 include_location: bool,
+                 include_location_specific_agents: bool,
+                 experimental_themes: List[str] = experimental_themes,
                  ) -> None:
 
         self.agent_classes = agent_classes
         self.theme_classes = theme_classes
 
-        self.params = params
-        self.seed = params.seed
+        self.seed = seed
+        self.include_location = include_location
+        self.include_location_specific_agents = include_location_specific_agents
+        self.include_location_specific_agents = include_location_specific_agents
+        self.experimental_themes = experimental_themes
 
         self.max_num_epochs = 1000  # max num epoch - corpus has statistically converged by then
 
         self.logical_forms: List[LogicalForm] = []
-
-        self.date = get_date()
+        self.populate()
 
     @property
     def has_forms(self):
@@ -100,16 +100,6 @@ class Corpus:
                                            )
                         self.logical_forms.append(form)
 
-    @classmethod
-    def from_params(cls,
-                    params: Params,
-                    ):
-
-        corpus = cls(params=params)
-        corpus.populate()
-
-        return corpus
-
     @property
     def vocab(self) -> Tuple[str]:
         assert self.has_forms
@@ -147,42 +137,41 @@ class Corpus:
         return False
 
     def get_logical_forms(self,
-                          params: Optional[Params] = None,
+                          num_epochs: int,
                           ) -> Generator[LogicalForm, None, None]:
 
-        if params is None:
-            params = self.params
+        assert self.has_forms
 
-        if params.num_epochs > self.max_num_epochs:
-            raise AttributeError(f'Requested {params.num_epochs} epochs but corpus was populated with {self.max_num_epochs} epochs')
+        if num_epochs > self.max_num_epochs:
+            raise AttributeError(f'Requested {num_epochs} epochs but corpus was populated with {self.max_num_epochs} epochs')
 
         # check that silent-instrument themes are actually themes in the corpus
         themes = set()
         for theme_class in self.theme_classes:
             themes.update(theme_class.names)
-        for theme in params.experimental_themes:
+        for theme in self.experimental_themes:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
 
         for lf in self.logical_forms:
 
-            if not lf.epoch < params.num_epochs:
+            if not lf.epoch < num_epochs:
                 continue
 
-            if not params.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
+            if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
                 continue
 
-            if lf.theme in params.experimental_themes:
+            if lf.theme in self.experimental_themes:
                 lf.instrument = None
 
-            if not params.include_location:
+            if not self.include_location:
                 lf.location = None
             yield lf
 
     def get_sentences(self,
-                      params: Optional[Params] = None,
+                      num_epochs: int,
                       ) -> Generator[str, None, None]:
-        for lf in self.get_logical_forms(params):
+        for lf in self.get_logical_forms(num_epochs):
 
             sentence = lf.agent + WS + lf.verb + WS + lf.theme + WS
 
@@ -195,10 +184,10 @@ class Corpus:
             yield sentence
 
     def get_trees(self,
-                  params: Optional[Params] = None,
+                  num_epochs: int,
                   ) -> Generator[Tuple, None, None]:
-        for lf in self.get_logical_forms(params):
-            if params.include_location:
+        for lf in self.get_logical_forms(num_epochs):
+            if self.include_location:
                 if lf.instrument:
                     tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
                 else:

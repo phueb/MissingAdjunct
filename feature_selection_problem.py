@@ -13,17 +13,12 @@ ultimately, then, the problem can be reduced toa feature-selection problem
 import numpy as np
 from itertools import product
 from sklearn.metrics.pairwise import cosine_similarity
-from missingadjunct.params import Params
 from missingadjunct.corpus import Corpus
 
 
-# parameters that decide how to sample from corpus
-params = Params(include_location=False,
+corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
-                num_epochs=1,
                 seed=1)
-
-corpus = Corpus.from_params(params)
 
 # collect co-occurrences from epoch -1
 num_vocab = len(corpus.vocab)
@@ -34,13 +29,13 @@ for lf in corpus.logical_forms:
     if lf.epoch != -1:
         continue
 
-    if not params.include_location_specific_agents and corpus.is_agent_location_specific(lf.agent):
+    if not corpus.include_location_specific_agents and corpus.is_agent_location_specific(lf.agent):
         continue
 
-    if lf.theme in params.experimental_themes:
+    if lf.theme in corpus.experimental_themes:
         lf.instrument = None
 
-    if not params.include_location:
+    if not corpus.include_location:
         lf.location = None
 
     items = [lf.agent, lf.verb, lf.theme, lf.instrument]

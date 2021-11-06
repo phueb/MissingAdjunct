@@ -2,18 +2,14 @@ from collections import Counter
 import numpy as np
 from pyitlib import discrete_random_variable as drv
 
-from missingadjunct.params import Params
 from missingadjunct.corpus import Corpus
 
 
-params = Params(include_location=False,
+corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
-                num_epochs=1,
-                seed=1
-                )
-corpus = Corpus.from_params(params)
+                seed=1)
 
-lfs_in_epoch = [lf for lf in corpus.get_logical_forms(params) if lf.epoch == 0]
+lfs_in_epoch = [lf for lf in corpus.get_logical_forms(num_epochs=1) if lf.epoch == 0]
 num_templates = len(list(lfs_in_epoch))  # should be 64 without a location-specific agents and locations
 assert num_templates == 64
 
@@ -22,15 +18,10 @@ max_h = drv.entropy_pmf([1/9] * 9, base=2)  # this is the entropy that distribut
 
 for num_epochs in range(1, corpus.max_num_epochs):
     # parameters that decide how to sample from corpus
-    params = Params(include_location=False,
-                    include_location_specific_agents=False,
-                    num_epochs=num_epochs,
-                    seed=1,
-                    )
 
     # collect templates (a template is a logical form with a specific verb and instrument, there are 64)
     template2agent_and_theme = {template_id: [] for template_id in range(num_templates)}
-    for n, lf in enumerate(corpus.get_logical_forms(params)):
+    for n, lf in enumerate(corpus.get_logical_forms(num_epochs)):
         if lf.epoch == -1:
             continue
         template_id = n % num_templates
