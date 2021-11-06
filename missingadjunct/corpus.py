@@ -11,6 +11,8 @@ from items import agent_classes, theme_classes, experimental_themes
 
 
 WS = ' '
+WITH = 'with'
+IN = 'in'
 
 
 class Corpus:
@@ -121,6 +123,7 @@ class Corpus:
             res.update([lf.agent, lf.verb, lf.theme, lf.instrument, lf.location])
 
         res.remove(None)
+        res.update({WITH, IN})
 
         return tuple(sorted(res))
 
@@ -150,10 +153,11 @@ class Corpus:
             sentence = lf.agent + WS + lf.verb + WS + lf.theme + WS
 
             if lf.instrument:
-                sentence += 'with' + WS + lf.instrument + WS
+                sentence += WITH + WS + lf.instrument + WS
 
             if lf.location:
-                sentence += 'in' + WS + lf.location + WS
+
+                sentence += IN + WS + lf.location + WS
 
             yield sentence
 
