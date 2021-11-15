@@ -33,6 +33,8 @@ class Corpus:
         self.num_epochs = num_epochs
         self.experimental_themes = experimental_themes
 
+        self.token2id = {t: n for n, t in enumerate(self.vocab)}
+
         # check that silent-instrument themes are actually themes in the corpus
         themes = set()
         for theme_class in self.theme_classes:
@@ -40,11 +42,6 @@ class Corpus:
         for theme in self.experimental_themes:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
-
-    @property
-    @lru_cache(maxsize=None)
-    def token2id(self):
-        return {t: n for n, t in enumerate(self.vocab)}
 
     def get_logical_forms(self) -> Generator[LogicalForm, None, None]:
         """
