@@ -57,8 +57,10 @@ def make_blank_sr_df():
                     phrase_unobserved = verb_from_other_theme.name + WS + theme
 
                     # skip cases where verb_from_other_theme is from sister-theme (e.g. "preserve")
-                    # because it should be counted once only, with phrase-type=observed
+                    # because it should be counted once only, with phrase-type=observed.
+                    # but we do collect the instrument, otherwise we systematically miss some
                     if phrase_unobserved in phrases:
+                        instruments.add(verb_from_other_theme.instrument)
                         continue
 
                     if theme in experimental_themes:
