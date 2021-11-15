@@ -5,6 +5,8 @@ import numpy as np
 
 from items import theme_classes, experimental_themes
 
+WS = ' '
+
 
 def make_blank_sr_df():
     """
@@ -17,7 +19,7 @@ def make_blank_sr_df():
     phrases = []
     instruments = set()
     name2col = defaultdict(list)
-    for theme_class in theme_classes:
+    for theme_class in theme_classes[:1]:
 
         for theme in theme_class.names:
 
@@ -27,7 +29,7 @@ def make_blank_sr_df():
                 if verb.type not in {2, 3}:
                     continue
 
-                phrase_observed = verb.name + ' ' + theme
+                phrase_observed = verb.name + WS + theme
 
                 if theme in experimental_themes:
                     theme_type = 'experimental'  # instruments are never observed with this theme
@@ -52,7 +54,12 @@ def make_blank_sr_df():
                     if verb_from_other_theme.type not in {2, 3}:
                         continue
 
-                    phrase_unobserved = verb_from_other_theme.name + ' ' + theme
+                    phrase_unobserved = verb_from_other_theme.name + WS + theme
+
+                    # skip cases where verb_from_other_theme is from sister-theme (e.g. "preserve")
+                    # because it should be counted once only, with phrase-type=observed
+                    if phrase_unobserved in phrases:
+                        continue
 
                     if theme in experimental_themes:
                         theme_type = 'experimental'
@@ -65,12 +72,12 @@ def make_blank_sr_df():
                     name2col['theme-type'].append(theme_type)
                     name2col['phrase-type'].append('unobserved')
                     instruments.add(verb_from_other_theme.instrument)
+
     # make columns for instruments
     for instrument in sorted(instruments):
         name2col[instrument] = [np.nan] * len(phrases)
     df = pd.DataFrame(data=name2col, index=phrases)
     df.index.name = 'phrase'
-    df.to_csv('blank_sr_df.csv')
 
     return df
 

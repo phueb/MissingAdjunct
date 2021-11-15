@@ -1,5 +1,4 @@
 from typing import Optional, Generator, List, Tuple
-import datetime
 import random
 from functools import lru_cache
 from collections import Counter
@@ -41,6 +40,11 @@ class Corpus:
         for theme in self.experimental_themes:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
+
+    @property
+    @lru_cache(maxsize=None)
+    def token2id(self):
+        return {t: n for n, t in enumerate(self.vocab)}
 
     def get_logical_forms(self) -> Generator[LogicalForm, None, None]:
         """
@@ -123,7 +127,9 @@ class Corpus:
             res.update([lf.agent, lf.verb, lf.theme, lf.instrument, lf.location])
 
         res.remove(None)
-        res.update({WITH, IN})
+        res.add(WITH)
+        if self.include_location:
+            res.add(IN)
 
         return tuple(sorted(res))
 
