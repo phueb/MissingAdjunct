@@ -19,7 +19,7 @@ def make_blank_sr_df():
     phrases = []
     instruments = set()
     name2col = defaultdict(list)
-    for theme_class in theme_classes[:1]:
+    for theme_class in theme_classes:
 
         for theme in theme_class.names:
 
