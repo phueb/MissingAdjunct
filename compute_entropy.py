@@ -8,9 +8,12 @@ from missingadjunct.corpus import Corpus
 corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
                 seed=1,
-                num_epochs=1)
-
+                num_epochs=1,
+                complete_epoch=False,
+                )
+# get num_templates (this must be computed from a standard non-complete epoch)
 lfs_in_epoch = [lf for lf in corpus.get_logical_forms() if lf.epoch == 0]
+print(lfs_in_epoch)
 num_templates = len(list(lfs_in_epoch))  # should be 64 without a location-specific agents and locations
 assert num_templates == 64
 
@@ -21,7 +24,8 @@ for num_epochs in range(1, 1000):
     corpus = Corpus(include_location=False,
                     include_location_specific_agents=False,
                     seed=1,
-                    num_epochs=num_epochs)
+                    num_epochs=num_epochs,
+                    complete_epoch=False)
 
     # collect templates (a template is a logical form with a specific verb and instrument, there are 64)
     template2agent_and_theme = {template_id: [] for template_id in range(num_templates)}

@@ -19,7 +19,9 @@ from missingadjunct.corpus import Corpus
 corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
                 seed=1,
-                num_epochs=1)
+                num_epochs=0,
+                complete_epoch=True,
+                )
 
 # collect co-occurrences from epoch -1
 num_vocab = len(corpus.vocab)
@@ -27,7 +29,7 @@ w2id = {w: n for n, w in enumerate(corpus.vocab)}
 co_mat = np.zeros((num_vocab, num_vocab), dtype=int)
 for lf in corpus.get_logical_forms():
 
-    if lf.epoch != -1:
+    if lf.epoch != -1:  # skip any data no in complete_epoch
         continue
 
     if not corpus.include_location_specific_agents and corpus.is_agent_location_specific(lf.agent):

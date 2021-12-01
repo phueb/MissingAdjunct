@@ -20,6 +20,7 @@ class Corpus:
                  include_location: bool,
                  include_location_specific_agents: bool,
                  num_epochs: int,
+                 complete_epoch: bool,  # whether to add 1 epoch of all possible combinations in beginning
                  experimental_themes: List[str] = experimental_themes,
                  ) -> None:
 
@@ -31,6 +32,7 @@ class Corpus:
         self.include_location_specific_agents = include_location_specific_agents
         self.include_location_specific_agents = include_location_specific_agents
         self.num_epochs = num_epochs
+        self.complete_epoch = complete_epoch
         self.experimental_themes = experimental_themes
 
         self.token2id = {t: n for n, t in enumerate(self.vocab)}
@@ -81,7 +83,8 @@ class Corpus:
                         if not self.include_location:
                             lf.location = None
 
-                        yield lf
+                        if self.complete_epoch:
+                            yield lf
 
         # for remaining epochs, sample randomly from agent and theme
         for epoch in range(self.num_epochs):

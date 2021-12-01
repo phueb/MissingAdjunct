@@ -5,7 +5,9 @@ from missingadjunct.corpus import Corpus
 corpus = Corpus(include_location=False,
                 include_location_specific_agents=False,
                 seed=1,
-                num_epochs=1)
+                num_epochs=0,
+                complete_epoch=True,
+                )
 
 # print counts of words for all epochs
 corpus.print_counts()
