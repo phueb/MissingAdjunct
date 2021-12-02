@@ -22,6 +22,8 @@ class Corpus:
                  num_epochs: int,
                  complete_epoch: bool,  # whether to add 1 epoch of all possible combinations in beginning
                  experimental_themes: List[str] = experimental_themes,
+                 add_with: bool = True,  # whether to add the preposition "with" before instrument
+                 add_in: bool = True,  # whether to add the preposition "in" before location
                  ) -> None:
 
         self.agent_classes = agent_classes
@@ -34,6 +36,8 @@ class Corpus:
         self.num_epochs = num_epochs
         self.complete_epoch = complete_epoch
         self.experimental_themes = experimental_themes
+        self.add_with = add_with
+        self.add_in = add_in
 
         self.token2id = {t: n for n, t in enumerate(self.vocab)}
 
@@ -127,8 +131,9 @@ class Corpus:
             res.update([lf.agent, lf.verb, lf.theme, lf.instrument, lf.location])
 
         res.remove(None)
-        res.add(WITH)
-        if self.include_location:
+        if self.add_with:
+            res.add(WITH)
+        if self.include_location and self.add_in:
             res.add(IN)
 
         return tuple(sorted(res))
@@ -159,11 +164,16 @@ class Corpus:
             sentence = lf.agent + WS + lf.verb + WS + lf.theme + WS
 
             if lf.instrument:
-                sentence += WITH + WS + lf.instrument + WS
+                if self.add_with:
+                    sentence += WITH + WS + lf.instrument + WS
+                else:
+                    sentence += lf.instrument + WS
 
             if lf.location:
-
-                sentence += IN + WS + lf.location + WS
+                if self.add_in:
+                    sentence += IN + WS + lf.location + WS
+                else:
+                    sentence += lf.location + WS
 
             yield sentence
 
