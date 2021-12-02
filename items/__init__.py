@@ -124,7 +124,7 @@ theme_classes = (
           names=('chicken', 'duck', 'turkey'),
           verbs=(Verb(type=0, name='season', instrument=None),
                  Verb(type=1, name='refrigerate', instrument=None),
-                 Verb(type=2, name='bake', instrument='oven'),
+                 Verb(type=2, name='grill', instrument='bbq'),
                  Verb(type=3, name='carve', instrument='knife'),
                  ),
           location=LOC1
