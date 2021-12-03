@@ -12,6 +12,7 @@ from items import agent_classes, theme_classes, experimental_themes
 WS = ' '
 WITH = 'with'
 IN = 'in'
+EOS = '<eos>'
 
 
 class Corpus:
@@ -39,9 +40,11 @@ class Corpus:
         self.add_with = add_with
         self.add_in = add_in
 
+        self.eos = EOS
+
         self.token2id = {t: n for n, t in enumerate(self.vocab)}
 
-        # check that silent-instrument themes are actually themes in the corpus
+        # check that experimental themes (those which do not occur with instruments) are actually themes in the corpus
         themes = set()
         for theme_class in self.theme_classes:
             themes.update(theme_class.names)
@@ -135,6 +138,7 @@ class Corpus:
             res.add(WITH)
         if self.include_location and self.add_in:
             res.add(IN)
+        res.add(EOS)
 
         return tuple(sorted(res))
 
@@ -158,6 +162,7 @@ class Corpus:
         return False
 
     def get_sentences(self,
+                      include_eos: bool = True,
                       ) -> Generator[str, None, None]:
         for lf in self.get_logical_forms():
 
@@ -174,6 +179,9 @@ class Corpus:
                     sentence += IN + WS + lf.location + WS
                 else:
                     sentence += lf.location + WS
+
+            if include_eos:
+                sentence += WS + EOS
 
             yield sentence
 
