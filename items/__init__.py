@@ -163,7 +163,7 @@ theme_classes = (
           ),
 
     Theme(category='PPE',
-          names=('googles', 'glove', 'faceshield'),
+          names=('goggles', 'glove', 'faceshield'),
           verbs=(Verb(type=0, name='inspect', instrument=None),
                  Verb(type=1, name='reuse', instrument=None),
                  Verb(type=2, name='dust', instrument='duster'),
