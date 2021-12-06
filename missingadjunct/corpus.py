@@ -190,12 +190,18 @@ class Corpus:
         for lf in self.get_logical_forms():
             if self.include_location:
                 if lf.instrument:
-                    tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
+                    if self.add_with:
+                        tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), lf.location))
+                    else:
+                        tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
                 else:
                     tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
             else:
                 if lf.instrument:
-                    tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
+                    if self.add_with:
+                        tree = (lf.agent, ((lf.verb, lf.theme), (WITH, lf.instrument)))
+                    else:
+                        tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
                 else:
                     tree = (lf.agent, (lf.verb, lf.theme))
             yield tree
