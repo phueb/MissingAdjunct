@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict
 import numpy as np
 
-from items import theme_classes, experimental_themes
+from items import theme_classes, experimental_themes, Verb
 
 WS = ' '
 
@@ -41,6 +41,7 @@ def make_blank_sr_df():
                 name2col['verb-type'].append(verb.type)
                 name2col['theme-type'].append(theme_type)
                 name2col['phrase-type'].append('observed')
+                name2col['location-type'].append(get_location_type(verb))
                 instruments.add(verb.instrument)
 
             # collect unobserved phrases
@@ -73,6 +74,7 @@ def make_blank_sr_df():
                     name2col['verb-type'].append(verb_from_other_theme.type)
                     name2col['theme-type'].append(theme_type)
                     name2col['phrase-type'].append('unobserved')
+                    name2col['location-type'].append(get_location_type(verb_from_other_theme))
                     instruments.add(verb_from_other_theme.instrument)
 
     # make columns for instruments
@@ -82,5 +84,18 @@ def make_blank_sr_df():
     df.index.name = 'phrase'
 
     return df
+
+
+def get_location_type(verb: Verb):
+    if verb.type == 3:
+        return {
+            'preserve': 1,
+            'repair': 1,
+            'cut': 1,
+            'clean': 1,
+        }.get(verb.name, 2)
+    else:
+        return 0
+
 
 
