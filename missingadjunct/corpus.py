@@ -199,6 +199,8 @@ class Corpus:
                         tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), (IN, lf.location)))
                     elif self.add_with and not self.add_in:
                         tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), lf.location))
+                    elif not self.add_with and self.add_in:
+                        tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), (IN, lf.location)))
                     else:
                         tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
 
