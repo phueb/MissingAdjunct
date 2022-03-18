@@ -79,6 +79,7 @@ class Corpus:
                                          verb=verb.name,
                                          instrument=verb.instrument,
                                          location=theme_class.location,
+                                         verb_type=verb.type,
                                          epoch=-1,
                                          )
 
@@ -113,6 +114,7 @@ class Corpus:
                                          verb=verb.name,
                                          instrument=verb.instrument,
                                          location=theme_class.location,
+                                         verb_type=verb.type,
                                          epoch=epoch,
                                          )
 
@@ -190,11 +192,11 @@ class Corpus:
 
         for lf in self.get_logical_forms():
 
-            # location is included
-            if self.include_location:
+            # instrument is included
+            if lf.instrument:
 
-                # instrument is included
-                if lf.instrument:
+                # location is included (only with type-3 verbs)
+                if self.include_location and lf.verb_type == 3:
                     if self.add_with and self.add_in:
                         tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), (IN, lf.location)))
                     elif self.add_with and not self.add_in:
@@ -204,25 +206,15 @@ class Corpus:
                     else:
                         tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
 
-                # instrument is not included
+                # location is not included
                 else:
-                    if self.add_in:
-                        tree = (lf.agent, ((lf.verb, lf.theme), (IN, lf.location)))
-                    else:
-                        tree = (lf.agent, ((lf.verb, lf.theme), lf.location))
-
-            # location is not included
-            else:
-
-                # instrument is included
-                if lf.instrument:
                     if self.add_with:
                         tree = (lf.agent, ((lf.verb, lf.theme), (WITH, lf.instrument)))
                     else:
                         tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
 
-                # instrument is not included
-                else:
-                    tree = (lf.agent, (lf.verb, lf.theme))
+            # instrument is not included
+            else:
+                tree = (lf.agent, (lf.verb, lf.theme))
 
             yield tree

@@ -13,6 +13,7 @@ class LogicalForm:
     instrument: Optional[str]
     location: Optional[str]
 
+    verb_type: int
     epoch: int
 
 
