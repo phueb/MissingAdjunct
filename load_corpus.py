@@ -2,7 +2,7 @@
 from missingadjunct.corpus import Corpus
 
 
-corpus = Corpus(include_location=False,
+corpus = Corpus(include_location=True,
                 include_location_specific_agents=False,
                 seed=1,
                 num_epochs=0,
