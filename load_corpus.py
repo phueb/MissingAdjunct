@@ -7,6 +7,8 @@ corpus = Corpus(include_location=True,
                 seed=1,
                 num_epochs=0,
                 complete_epoch=True,
+                add_with=True,
+                add_in=False,
                 )
 
 # print counts of words for all epochs

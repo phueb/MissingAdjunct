@@ -187,24 +187,40 @@ class Corpus:
 
     def get_trees(self,
                   ) -> Generator[Tuple, None, None]:
+
         for lf in self.get_logical_forms():
+
+            # location is included
             if self.include_location:
+
+                # instrument is included
                 if lf.instrument:
-                    if self.add_with:
+                    if self.add_with and self.add_in:
+                        tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), (IN, lf.location)))
+                    elif self.add_with and not self.add_in:
                         tree = (lf.agent, (((lf.verb, lf.theme), (WITH, lf.instrument)), lf.location))
                     else:
                         tree = (lf.agent, (((lf.verb, lf.theme), lf.instrument), lf.location))
+
+                # instrument is not included
                 else:
-                    if self.add_with:
+                    if self.add_in:
                         tree = (lf.agent, ((lf.verb, lf.theme), (IN, lf.location)))
                     else:
                         tree = (lf.agent, ((lf.verb, lf.theme), lf.location))
+
+            # location is not included
             else:
+
+                # instrument is included
                 if lf.instrument:
                     if self.add_with:
                         tree = (lf.agent, ((lf.verb, lf.theme), (WITH, lf.instrument)))
                     else:
                         tree = (lf.agent, ((lf.verb, lf.theme), lf.instrument))
+
+                # instrument is not included
                 else:
                     tree = (lf.agent, (lf.verb, lf.theme))
+
             yield tree
