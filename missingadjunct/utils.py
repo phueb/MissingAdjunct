@@ -1,4 +1,3 @@
-
 import pandas as pd
 from collections import defaultdict
 import numpy as np
@@ -8,7 +7,7 @@ from items import theme_classes, experimental_themes, Verb
 WS = ' '
 
 
-def make_blank_sr_df():
+def make_blank_sr_df() -> pd.DataFrame:
     """
     Make a blank data frame with phrases in the index and instruments in the columns.
 
@@ -42,6 +41,7 @@ def make_blank_sr_df():
                 name2col['theme-type'].append(theme_type)
                 name2col['phrase-type'].append('observed')
                 name2col['location-type'].append(get_location_type(verb))
+
                 instruments.add(verb.instrument)
 
             # collect unobserved phrases
@@ -58,10 +58,8 @@ def make_blank_sr_df():
                     phrase_unobserved = verb_from_other_theme.name + WS + theme
 
                     # skip cases where verb_from_other_theme is from sister-theme (e.g. "preserve")
-                    # because it should be counted once only, with phrase-type=observed.
-                    # but we do collect the instrument, otherwise we systematically miss some
+                    # because it should be counted once only, with phrase-type=observed (in outer loop).
                     if phrase_unobserved in phrases:
-                        instruments.add(verb_from_other_theme.instrument)
                         continue
 
                     if theme in experimental_themes:
@@ -69,13 +67,20 @@ def make_blank_sr_df():
                     else:
                         continue
 
+                    # is VP just unobserved, or also unrelated?
+                    # an unrelated VP is not only unobserved, but the theme is not a member of a related category
+                    # to check if theme is from related category, we check if other category has the same type 0 verb
+                    if theme_class.verbs[0] == theme_class_other.verbs[0]:
+                        phrase_type = 'unobserved'
+                    else:
+                        phrase_type = 'unrelated'
+
                     # collect
                     phrases.append(phrase_unobserved)
                     name2col['verb-type'].append(verb_from_other_theme.type)
                     name2col['theme-type'].append(theme_type)
-                    name2col['phrase-type'].append('unobserved')
+                    name2col['phrase-type'].append(phrase_type)
                     name2col['location-type'].append(get_location_type(verb_from_other_theme))
-                    instruments.add(verb_from_other_theme.instrument)
 
     # make columns for instruments
     for instrument in sorted(instruments):
@@ -96,6 +101,3 @@ def get_location_type(verb: Verb):
         }.get(verb.name, 2)
     else:
         return 0
-
-
-
