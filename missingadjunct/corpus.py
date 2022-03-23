@@ -66,6 +66,7 @@ class Corpus:
 
             for agent_class in self.agent_classes:
 
+                # disallow incompatible agents and locations
                 if agent_class.location is not None:
                     if agent_class.location != theme_class.location:
                         continue
@@ -83,11 +84,14 @@ class Corpus:
                                          epoch=-1,
                                          )
 
-                        # check if lf is requested
+                        # disallow location-specific agents if not requested
                         if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
                             continue
+
                         if lf.theme in self.experimental_themes:
                             lf.instrument = None
+                            lf.location = None
+
                         if not self.include_location:
                             lf.location = None
 
