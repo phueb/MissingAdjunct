@@ -25,6 +25,7 @@ class Corpus:
                  experimental_themes: List[str] = experimental_themes,
                  add_with: bool = True,  # whether to add the preposition "with" before instrument
                  add_in: bool = True,  # whether to add the preposition "in" before location
+                 strict_compositional: bool = False,  # whether to exclude type-3 verb + exp theme combinations
                  ) -> None:
 
         self.agent_classes = agent_classes
@@ -39,6 +40,7 @@ class Corpus:
         self.experimental_themes = experimental_themes
         self.add_with = add_with
         self.add_in = add_in
+        self.strict_compositional = strict_compositional
 
         self.eos = EOS
 
@@ -88,6 +90,14 @@ class Corpus:
 
             for agent, theme in product(agent_class.names, theme_class.names):
 
+                # disallow location-specific agents if not requested
+                if not self.include_location_specific_agents and self.is_agent_location_specific(agent):
+                    continue
+
+                # disallow type-3 verb + experimental theme
+                if self.strict_compositional and verb.type == 3 and theme in self.experimental_themes:
+                    continue
+
                 lf = LogicalForm(agent=agent,
                                  theme=theme,
                                  verb=verb.name,
@@ -96,10 +106,6 @@ class Corpus:
                                  verb_type=verb.type,
                                  epoch=-1,
                                  )
-
-                # disallow location-specific agents if not requested
-                if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
-                    continue
 
                 if lf.theme in self.experimental_themes:
                     lf.instrument = None
@@ -118,6 +124,15 @@ class Corpus:
 
             agent = random.choice(agent_class.names)
             theme = random.choice(theme_class.names)
+
+            # disallow location-specific agents if not requested
+            if not self.include_location_specific_agents and self.is_agent_location_specific(agent):
+                continue
+
+            # disallow type-3 verb + experimental theme
+            if self.strict_compositional and verb.type == 3 and theme in self.experimental_themes:
+                continue
+
             lf = LogicalForm(agent=agent,
                              theme=theme,
                              verb=verb.name,
@@ -126,10 +141,6 @@ class Corpus:
                              verb_type=verb.type,
                              epoch=epoch,
                              )
-
-            # disallow location-specific agents if not requested
-            if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
-                continue
 
             if lf.theme in self.experimental_themes:
                 lf.instrument = None
