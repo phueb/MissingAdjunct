@@ -52,6 +52,28 @@ class Corpus:
             if theme not in themes:
                 raise KeyError(f'{theme} is not a theme in the corpus')
 
+    def _gen_templates(self,
+                       num_epochs: Optional[int] = None,
+                       ):
+        """
+        a template consists of a verb, an agent class, and a theme class
+        """
+
+        for epoch in range(num_epochs or self.num_epochs):
+
+            for theme_class in self.theme_classes:
+
+                for agent_class in self.agent_classes:
+
+                    # disallow incompatible agents and locations
+                    if agent_class.location is not None:
+                        if agent_class.location != theme_class.location:
+                            continue
+
+                    for verb in theme_class.verbs:
+
+                        yield theme_class, agent_class, verb
+
     def get_logical_forms(self) -> Generator[LogicalForm, None, None]:
         """
         for all but first each epoch, get all possible requested forms, and randomly chose from agent and theme.
@@ -61,76 +83,62 @@ class Corpus:
 
         random.seed(self.seed)
 
-        # first, get all possible requested logical forms once
-        for theme_class in self.theme_classes:
+        # for the first epoch, get all possible requested logical forms once
+        for theme_class, agent_class, verb in self._gen_templates(num_epochs=1):
 
-            for agent_class in self.agent_classes:
+            for agent, theme in product(agent_class.names, theme_class.names):
 
-                # disallow incompatible agents and locations
-                if agent_class.location is not None:
-                    if agent_class.location != theme_class.location:
-                        continue
+                lf = LogicalForm(agent=agent,
+                                 theme=theme,
+                                 verb=verb.name,
+                                 instrument=verb.instrument,
+                                 location=theme_class.location,
+                                 verb_type=verb.type,
+                                 epoch=-1,
+                                 )
 
-                for verb in theme_class.verbs:
+                # disallow location-specific agents if not requested
+                if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
+                    continue
 
-                    for agent, theme in product(agent_class.names, theme_class.names):
+                if lf.theme in self.experimental_themes:
+                    lf.instrument = None
+                    lf.location = None
 
-                        lf = LogicalForm(agent=agent,
-                                         theme=theme,
-                                         verb=verb.name,
-                                         instrument=verb.instrument,
-                                         location=theme_class.location,
-                                         verb_type=verb.type,
-                                         epoch=-1,
-                                         )
+                if not self.include_location:
+                    lf.location = None
 
-                        # disallow location-specific agents if not requested
-                        if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
-                            continue
-
-                        if lf.theme in self.experimental_themes:
-                            lf.instrument = None
-                            lf.location = None
-
-                        if not self.include_location:
-                            lf.location = None
-
-                        if self.complete_epoch:
-                            yield lf
+                if self.complete_epoch:
+                    yield lf
 
         # for remaining epochs, sample randomly from agent and theme
-        for epoch in range(self.num_epochs):
+        epoch = 0
+        for theme_class, agent_class, verb in self._gen_templates():
+            epoch += 1
 
-            for theme_class in self.theme_classes:
+            agent = random.choice(agent_class.names)
+            theme = random.choice(theme_class.names)
+            lf = LogicalForm(agent=agent,
+                             theme=theme,
+                             verb=verb.name,
+                             instrument=verb.instrument,
+                             location=theme_class.location,
+                             verb_type=verb.type,
+                             epoch=epoch,
+                             )
 
-                for agent_class in self.agent_classes:
+            # disallow location-specific agents if not requested
+            if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
+                continue
 
-                    if agent_class.location is not None:
-                        if agent_class.location != theme_class.location:
-                            continue
+            if lf.theme in self.experimental_themes:
+                lf.instrument = None
+                lf.location = None
 
-                    for verb in theme_class.verbs:
+            if not self.include_location:
+                lf.location = None
 
-                        agent = random.choice(agent_class.names)
-                        theme = random.choice(theme_class.names)
-                        lf = LogicalForm(agent=agent,
-                                         theme=theme,
-                                         verb=verb.name,
-                                         instrument=verb.instrument,
-                                         location=theme_class.location,
-                                         verb_type=verb.type,
-                                         epoch=epoch,
-                                         )
-
-                        # check if lf is requested
-                        if not self.include_location_specific_agents and self.is_agent_location_specific(lf.agent):
-                            continue
-                        if lf.theme in self.experimental_themes:
-                            lf.instrument = None
-                        if not self.include_location:
-                            lf.location = None
-
-                        yield lf
+            yield lf
 
     @property
     def vocab(self) -> Tuple:
