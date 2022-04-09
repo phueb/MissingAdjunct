@@ -109,7 +109,7 @@ class Corpus:
 
                 if lf.theme in self.experimental_themes:
                     lf.instrument = None
-                    lf.location = None
+                    # lf.location = None  # the point of location is to cluster all themes (also experimental themes)
 
                 if not self.include_location:
                     lf.location = None
@@ -118,7 +118,7 @@ class Corpus:
                     yield lf
 
         # for remaining epochs, sample randomly from agent and theme
-        epoch = 0
+        epoch = -1
         for theme_class, agent_class, verb in self._gen_templates():
             epoch += 1
 
@@ -144,7 +144,7 @@ class Corpus:
 
             if lf.theme in self.experimental_themes:
                 lf.instrument = None
-                lf.location = None
+                # lf.location = None  # the point of location is to cluster all themes (including experimental themes)
 
             if not self.include_location:
                 lf.location = None
